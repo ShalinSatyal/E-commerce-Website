@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <title>Purchase History - SRS Fashion Store</title>
+
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <header class="navbar">
+         <a href="index.html" class="logo">SRS Fashion Store</a>
+
+      <nav>
+        <a href="index.html"> Home </a>
+
+        <a href="cart.html"> Cart </a>
+
+        <a href="purchase-history.html"> Purchase History </a>
+
+        <a href="#" onclick="logout()"> Logout </a>
+      </nav>
+    </header>
+
+    <main>
+      <h3 class="section-title">My Purchase History</h3>
+
+      <div id="orders-container">Loading orders...</div>
+    </main>
+
+    <script>
+      async function loadOrders() {
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+          window.location.href = "login.html";
+
+          return;
+        }
+
+        try {
+          const response = await fetch("/api/orders/my-orders", {
+            headers: {
+              Authorization: "Bearer " + token,
+            },
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            document.getElementById("orders-container").textContent =
+              data.message;
+
+            return;
+          }
+
+          const container = document.getElementById("orders-container");
+
+          if (data.length === 0) {
+            container.innerHTML = "<p>You have not made any purchases yet.</p>";
+
+            return;
+          }
+
+          container.innerHTML = "";
+
+          data.forEach(function (order) {
+            const orderDiv = document.createElement("div");
+
+            orderDiv.className = "cart-summary";
+
+            let itemsHTML = "";
+
+            order.items.forEach(function (item) {
+              itemsHTML += `
+                                    <li>
+                                        ${item.product_name}
+                                        ×
+                                        ${item.quantity}
+                                        —
+                                        NPR ${Number(item.price).toLocaleString("en-NP")}
+                                    </li>
+                                    `;
+            });
+
+            orderDiv.innerHTML = `
+                            <h3>
+                                Order ${order.order_number}
+                            </h3>
+
+                            <p>
+                                Date:
+                                ${new Date(order.created_at).toLocaleString()}
+                            </p>
+
+                            <p>
+                                Payment:
+                                ${order.payment_method}
+                            </p>
+
+                            <h4>
+                                Products
+                            </h4>
+
+                            <ul>
+                                ${itemsHTML}
+                            </ul>
+
+                            <p>
+                                <strong>
+                                    Total:
+                                    NPR ${Number(order.total_amount).toLocaleString("en-NP")}
+                                </strong>
+                            </p>
+                            `;
+
+            container.appendChild(orderDiv);
+          });
+        } catch (error) {
+          console.error(error);
+
+          document.getElementById("orders-container").textContent =
+            "Could not load purchase history.";
+        }
+      }
+
+      function logout() {
+        localStorage.removeItem("token");
+
+        localStorage.removeItem("user");
+
+        window.location.href = "login.html";
+      }
+
+      loadOrders();
+    </script>
+  </body>
+</html>

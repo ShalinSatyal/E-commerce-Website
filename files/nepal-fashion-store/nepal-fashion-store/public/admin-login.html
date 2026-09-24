@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <title>Admin Login - SRS Fashion Store</title>
+
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <header class="navbar">
+         <a href="index.html" class="logo">SRS Fashion Store</a>
+
+      <nav>
+        <a href="index.html"> Home </a>
+      </nav>
+    </header>
+
+    <main>
+      <h3 class="section-title">Admin Login</h3>
+
+      <form id="admin-login-form">
+        <label for="email"> Admin Email </label>
+
+        <input type="email" id="email" required />
+
+        <label for="password"> Password </label>
+
+        <input type="password" id="password" required />
+
+        <button type="submit" class="btn">Admin Login</button>
+      </form>
+
+      <p id="admin-login-message"></p>
+    </main>
+
+    <script>
+      document
+        .getElementById("admin-login-form")
+        .addEventListener("submit", async function (event) {
+          event.preventDefault();
+
+          const email = document.getElementById("email").value;
+
+          const password = document.getElementById("password").value;
+
+          const response = await fetch("/api/auth/login", {
+            method: "POST",
+
+            headers: {
+              "Content-Type": "application/json",
+            },
+
+            body: JSON.stringify({
+              email,
+              password,
+            }),
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            document.getElementById("admin-login-message").textContent =
+              data.message;
+
+            return;
+          }
+
+          if (data.user.role !== "admin") {
+            document.getElementById("admin-login-message").textContent =
+              "This account is not an admin account.";
+
+            return;
+          }
+
+          localStorage.setItem("token", data.token);
+
+          localStorage.setItem("user", JSON.stringify(data.user));
+
+          window.location.href = "admin-dashboard.html";
+        });
+    </script>
+  </body>
+</html>

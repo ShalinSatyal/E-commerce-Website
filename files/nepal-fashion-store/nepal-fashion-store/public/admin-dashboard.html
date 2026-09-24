@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <title>Admin Dashboard - SRS Fashion Store</title>
+
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <header class="navbar">
+          <a href="index.html" class="logo">SRS Fashion Store</a>
+
+      <nav>
+        <a href="index.html"> Store </a>
+
+        <a href="#" onclick="logout()"> Logout </a>
+      </nav>
+    </header>
+
+    <main>
+      <h3 class="section-title">All Purchases</h3>
+
+      <div id="orders-container">Loading orders...</div>
+    </main>
+
+    <script>
+      async function loadAllOrders() {
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+          window.location.href = "admin-login.html";
+
+          return;
+        }
+
+        const user = JSON.parse(localStorage.getItem("user"));
+
+        if (!user || user.role !== "admin") {
+          window.location.href = "admin-login.html";
+
+          return;
+        }
+
+        try {
+          const response = await fetch("/api/orders/all", {
+            headers: {
+              Authorization: "Bearer " + token,
+            },
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            document.getElementById("orders-container").textContent =
+              data.message;
+
+            return;
+          }
+
+          const container = document.getElementById("orders-container");
+
+          if (data.length === 0) {
+            container.innerHTML = "<p>No purchases have been made yet.</p>";
+
+            return;
+          }
+
+          container.innerHTML = "";
+
+          data.forEach(function (order) {
+            const orderDiv = document.createElement("div");
+
+            orderDiv.className = "cart-summary";
+
+            let itemsHTML = "";
+
+            order.items.forEach(function (item) {
+              itemsHTML += `
+                                    <li>
+                                        ${item.product_name}
+                                        ×
+                                        ${item.quantity}
+                                        —
+                                        NPR ${Number(item.price).toLocaleString("en-NP")}
+                                    </li>
+                                    `;
+            });
+
+            orderDiv.innerHTML = `
+                            <h3>
+                                ${order.order_number}
+                            </h3>
+
+                            <p>
+                                Customer:
+                                ${order.customer_name}
+                            </p>
+
+                            <p>
+                                Email:
+                                ${order.email}
+                            </p>
+
+                            <p>
+                                Phone:
+                                ${order.phone}
+                            </p>
+
+                            <p>
+                                Address:
+                                ${order.address},
+                                ${order.city}
+                            </p>
+
+                            <p>
+                                Payment:
+                                ${order.payment_method}
+                            </p>
+
+                            <p>
+                                Date:
+                                ${new Date(order.created_at).toLocaleString()}
+                            </p>
+
+                            <h4>
+                                Products
+                            </h4>
+
+                            <ul>
+                                ${itemsHTML}
+                            </ul>
+
+                            <p>
+                                <strong>
+                                    Total:
+                                    NPR ${Number(order.total_amount).toLocaleString("en-NP")}
+                                </strong>
+                            </p>
+                            `;
+
+            container.appendChild(orderDiv);
+          });
+        } catch (error) {
+          console.error(error);
+
+          document.getElementById("orders-container").textContent =
+            "Could not load orders.";
+        }
+      }
+
+      function logout() {
+        localStorage.removeItem("token");
+
+        localStorage.removeItem("user");
+
+        window.location.href = "admin-login.html";
+      }
+
+      loadAllOrders();
+    </script>
+  </body>
+</html>

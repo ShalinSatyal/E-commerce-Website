@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <title>Login - SRS Fashion Store</title>
+
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <header class="navbar">
+       <a href="index.html" class="logo">SRS Fashion Store</a>
+
+      <nav>
+        <a href="index.html"> Home </a>
+
+        <a href="register.html"> Register </a>
+
+        <a href="admin-login.html">Admin Login</a>
+      </nav>
+    </header>
+
+    <main>
+      <h3 class="section-title">Login</h3>
+
+      <form id="login-form">
+        <label for="email"> Email </label>
+
+        <input type="email" id="email" required />
+
+        <label for="password"> Password </label>
+
+        <input type="password" id="password" required />
+
+        <button type="submit" class="btn">Login</button>
+      </form>
+      <br>
+
+      <p id="login-message"></p>
+
+      <p>
+        Don't have an account?
+        <a href="register.html"> Register </a>
+      </p>
+      <br>
+      <p>
+        If you are the admin of this website!
+        <a href="admin-login.html"> Admin Login </a>
+      </p>
+    </main>
+
+    <script>
+      document
+        .getElementById("login-form")
+        .addEventListener("submit", async function (event) {
+          event.preventDefault();
+
+          const email = document.getElementById("email").value;
+
+          const password = document.getElementById("password").value;
+
+          try {
+            const response = await fetch("/api/auth/login", {
+              method: "POST",
+
+              headers: {
+                "Content-Type": "application/json",
+              },
+
+              body: JSON.stringify({
+                email,
+                password,
+              }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+              document.getElementById("login-message").textContent =
+                data.message;
+
+              return;
+            }
+
+            localStorage.setItem("token", data.token);
+
+            localStorage.setItem("user", JSON.stringify(data.user));
+
+            if (data.user.role === "admin") {
+              window.location.href = "admin-dashboard.html";
+            } else {
+              window.location.href = "index.html";
+            }
+          } catch (error) {
+            console.error(error);
+
+            document.getElementById("login-message").textContent =
+              "Could not connect to server.";
+          }
+        });
+    </script>
+  </body>
+</html>

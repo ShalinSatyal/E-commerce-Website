@@ -1,0 +1,333 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Your Cart - SRS Fashion Store</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="navbar">
+    <h1 class="logo">SRS Fashion Store</h1>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="cart.html">Cart (<span id="cart-count">0</span>)</a>
+    </nav>
+  </header>
+
+  <main>
+    <h3 class="section-title">Your Shopping Cart</h3>
+    <div id="cart-items"></div>
+
+    <div class="cart-summary">
+      <p>Total: <span id="cart-total">Rs. 0</span></p>
+      <a href="checkout.html"><button class="btn" id="checkout-btn">Proceed to Checkout</button></a>
+    </div>
+  </main>
+
+
+
+
+  <script src="script.js"></script>
+  <script>
+    renderCart();
+    updateCartCount();
+  </script>
+</body>
+</html> -->
+
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Your Cart - SRS Fashion Store</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <header class="navbar">
+        <a href="index.html" class="logo">SRS Fashion Store</a>
+
+
+<nav>
+  <a href="index.html">Home</a>
+  <a href="cart.html" class="active">
+    🛒 Cart (<span id="cart-count">0</span>)
+  </a>
+   <a href="purchase-history.html">Purchase History</a>
+</nav>
+
+
+  </header>
+
+  <main class="cart-page">
+
+
+<!-- Cart Header -->
+
+<div class="cart-header">
+  <div>
+    <span class="cart-label"></span>
+    <h2>Your Shopping Cart</h2>
+
+  </div>
+
+  <a href="index.html" class="continue-shopping">
+    ← Continue Shopping
+  </a>
+</div>
+
+
+
+
+
+
+<!-- Main Cart Area -->
+
+<div class="cart-layout">
+
+  <!-- Products -->
+
+  <section class="cart-products">
+
+    <div class="cart-products-header">
+      <h3>Your Items</h3>
+      <span id="cart-item-count">0 items</span>
+    </div>
+
+    <div id="cart-items"></div>
+
+  </section>
+
+
+  <!-- Order Summary -->
+
+  <aside class="cart-summary-card">
+
+    <h3>Order Summary</h3>
+
+    <div class="summary-row">
+      <span>Subtotal</span>
+      <span id="cart-total">Rs. 0</span>
+    </div>
+
+    <div class="summary-row">
+      <span>Delivery</span>
+      <span id="delivery-cost">Rs. 150</span>
+    </div>
+
+    <div class="summary-divider"></div>
+
+    <div class="summary-total">
+      <span>Total</span>
+      <strong id="final-total">Rs. 150</strong>
+    </div>
+
+    <a href="checkout.html" class="checkout-link">
+      <button class="btn checkout-cart-btn" id="checkout-btn">
+        Proceed to Checkout →
+      </button>
+    </a>
+
+    <div class="secure-checkout">
+      🔒 Secure checkout
+    </div>
+
+  </aside>
+
+</div>
+
+
+<!-- Store Benefits -->
+
+<div class="cart-benefits">
+
+  <div class="benefit">
+    <span>🚚</span>
+    <div>
+      <strong>Fast Delivery</strong>
+      <p>Quick delivery across Nepal</p>
+    </div>
+  </div>
+
+  <div class="benefit">
+    <span>🔄</span>
+    <div>
+      <strong>Easy Returns</strong>
+      <p>Simple and hassle-free returns</p>
+    </div>
+  </div>
+
+  <div class="benefit">
+    <span>🔒</span>
+    <div>
+      <strong>Secure Checkout</strong>
+      <p>Your information stays protected</p>
+    </div>
+  </div>
+
+</div>
+
+
+  </main>
+
+  <script src="script.js"></script>
+
+  <script>
+
+    renderCart();
+    updateCartCount();
+
+    /*
+      Update cart information after the
+      existing renderCart() function runs.
+    */
+
+    function updateCartExtras() {
+
+      const cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+      let itemCount = 0;
+      let subtotal = 0;
+
+      cart.forEach(function(item) {
+
+        itemCount += Number(item.quantity) || 0;
+
+        subtotal +=
+          (Number(item.price) || 0) *
+          (Number(item.quantity) || 0);
+
+      });
+
+
+      /* Item count */
+
+      const itemCountElement =
+        document.getElementById("cart-item-count");
+
+      if (itemCountElement) {
+
+        itemCountElement.textContent =
+          itemCount + (itemCount === 1 ? " item" : " items");
+
+      }
+
+
+      /* Cart message */
+
+      const message =
+        document.getElementById("cart-item-message");
+
+      if (message) {
+
+        if (itemCount === 0) {
+
+          message.textContent =
+            "Your shopping bag is waiting for something special.";
+
+        } else {
+
+          message.textContent =
+            "You have " + itemCount +
+            (itemCount === 1 ? " item" : " items") +
+            " in your shopping bag.";
+
+        }
+
+      }
+
+
+      /* Delivery progress */
+
+      const freeDeliveryAmount = 3000;
+
+      const progress =
+        Math.min((subtotal / freeDeliveryAmount) * 100, 100);
+
+      const progressBar =
+        document.getElementById("delivery-progress");
+
+      if (progressBar) {
+
+        progressBar.style.width = progress + "%";
+
+      }
+
+
+      const deliveryMessage =
+        document.getElementById("delivery-message");
+
+      const deliveryCost =
+        document.getElementById("delivery-cost");
+
+      const finalTotal =
+        document.getElementById("final-total");
+
+
+      /* Free delivery */
+
+      if (subtotal >= freeDeliveryAmount) {
+
+        if (deliveryMessage) {
+
+          deliveryMessage.textContent =
+            "🎉 You unlocked FREE delivery!";
+
+        }
+
+        if (deliveryCost) {
+
+          deliveryCost.textContent = "FREE";
+
+        }
+
+        if (finalTotal) {
+
+          finalTotal.textContent =
+            "Rs. " + subtotal.toLocaleString();
+
+        }
+
+      } else {
+
+        const remaining =
+          freeDeliveryAmount - subtotal;
+
+        if (deliveryMessage) {
+
+          deliveryMessage.textContent =
+            "Add Rs. " +
+            remaining.toLocaleString() +
+            " more for FREE delivery!";
+
+        }
+
+        if (deliveryCost) {
+
+          deliveryCost.textContent = "Rs. 150";
+
+        }
+
+        if (finalTotal) {
+
+          finalTotal.textContent =
+            "Rs. " +
+            (subtotal + 150).toLocaleString();
+
+        }
+
+      }
+
+    }
+
+
+    updateCartExtras();
+
+  </script>
+
+</body>
+</html>

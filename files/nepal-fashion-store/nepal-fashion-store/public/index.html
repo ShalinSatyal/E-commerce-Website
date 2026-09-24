@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SRS Fashion Store</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="navbar">
+    <a href="index.html" class="logo">SRS Fashion Store</a>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="cart.html">Cart (<span id="cart-count">0</span>)</a>
+      <a href="login.html">Login</a>
+      
+    </nav>
+  </header>
+
+<section class="banner">
+  <div class="banner-content">
+
+    <p class="banner-tag">NEW SEASON • NEW STYLE</p>
+
+    <h2>Style That Speaks For You</h2>
+
+    <p>
+      Discover the latest clothing, sneakers, sports shoes
+      and boots — designed for your everyday look.
+    </p>
+
+    <div class="banner-buttons">
+      <a href="#product-grid" class="banner-btn">Shop Collection</a>
+      <a href="#product-grid" class="banner-btn secondary-btn">Explore Styles</a>
+    </div>
+
+    <p class="banner-quote">
+      “Fashion is not just what you wear — it's how you express yourself.”
+    </p>
+
+  </div>
+</section>
+
+
+
+  <main>
+    <h3 class="section-title">All Products</h3>
+    <p id="loading-msg">Loading products...</p>
+    <div class="product-grid" id="product-grid"></div>
+  </main>
+
+  <footer>
+    <div class="footer-container">
+
+      <div class="footer-section">
+        <h3>SRS Fashion Store</h3>
+        <p>
+          Trendy clothing, shoes and fashion essentials
+          for your everyday style.
+        </p>
+      </div>
+
+      <div class="footer-section">
+        <h4>Quick Links</h4>
+        <a href="index.html">Home</a>
+        <a href="cart.html">Shopping Cart</a>
+        <a href="#">New Arrivals</a>
+        <a href="#">Products</a>
+      </div>
+
+      <div class="footer-section">
+        <h4>Customer Support</h4>
+        <a href="#">Shipping & Delivery</a>
+        <a href="#">Return Policy</a>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms & Conditions</a>
+      </div>
+
+      <div class="footer-section">
+        <h4>Contact Us</h4>
+        <p>📞 +977-98XXXXXXXX</p>
+        <p>✉️ srsfashionstore@gmail.com</p>
+        <p>🕒 Sun - Fri: 10:00 AM - 7:00 PM</p>
+      </div>
+
+<div class="footer-section">
+  <h4>Location</h4>
+  <p>📍 SRS Fashion Store</p>
+  <p>Kathmandu, Nepal</p>
+  <p>Open daily: 10:00 AM - 7:00 PM</p>
+</div>
+
+    </div>
+
+    <div class="footer-bottom">
+      <p>&copy; 2026 SRS Fashion Store. All rights reserved.</p>
+    </div>
+  </footer>
+
+
+
+  <script src="script.js"></script>
+  <script>
+    loadProducts();
+    updateCartCount();
+  </script>
+</body>
+</html>
