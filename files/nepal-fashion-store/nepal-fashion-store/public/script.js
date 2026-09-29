@@ -802,10 +802,13 @@ function showCheckoutSummary() {
 // PLACE ORDER
 // ======================================================
 
+// ======================================================
+// PLACE ORDER
+// ======================================================
+
 async function placeOrder() {
 
   const cart = getCart();
-
 
   if (cart.length === 0) {
 
@@ -814,7 +817,6 @@ async function placeOrder() {
     );
 
     return;
-
   }
 
 
@@ -832,7 +834,6 @@ async function placeOrder() {
       "login.html";
 
     return;
-
   }
 
 
@@ -867,14 +868,159 @@ async function placeOrder() {
 
 
   // ====================================================
-  // IMPORTANT:
-  // Cart uses:
-  // item.id
-  // item.title
-  // item.price
-  // item.quantity
-  //
-  // So we send those exact values to the backend.
+  // eSEWA PAYMENT
+  // ====================================================
+
+  if (paymentMethod === "esewa") {
+
+    try {
+
+      const response =
+        await fetch(
+          "/api/esewa/initiate",
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json",
+
+              "Authorization":
+                "Bearer " + token
+            },
+
+            body:
+              JSON.stringify({
+                customerName:
+                  name,
+
+                phone:
+                  phone,
+
+                address:
+                  address,
+
+                city:
+                  city,
+
+                items:
+                  cart.map(function(item) {
+
+                    return {
+                      productId:
+                        Number(item.id),
+
+                      productName:
+                        item.title,
+
+                      price:
+                        Number(item.price),
+
+                      quantity:
+                        Number(item.quantity)
+                    };
+
+                  })
+              })
+          }
+        );
+
+
+      const data =
+        await response.json();
+
+
+      if (!response.ok) {
+
+        console.error(
+          "eSewa payment failed:",
+          data
+        );
+
+        alert(
+          data.message ||
+          "Could not start eSewa payment."
+        );
+
+        return;
+      }
+
+
+      // Create eSewa payment form
+      const form =
+        document.createElement(
+          "form"
+        );
+
+
+      form.method =
+        "POST";
+
+
+      form.action =
+        data.paymentUrl;
+
+
+      // Add eSewa payment data
+      Object.keys(
+        data.paymentData
+      ).forEach(function(key) {
+
+        const input =
+          document.createElement(
+            "input"
+          );
+
+
+        input.type =
+          "hidden";
+
+
+        input.name =
+          key;
+
+
+        input.value =
+          data.paymentData[key];
+
+
+        form.appendChild(
+          input
+        );
+
+      });
+
+
+      document.body.appendChild(
+        form
+      );
+
+
+      // Send customer to eSewa
+      form.submit();
+
+
+    } catch (error) {
+
+      console.error(
+        "eSewa payment error:",
+        error
+      );
+
+
+      alert(
+        "Something went wrong while starting eSewa payment."
+      );
+
+    }
+
+
+    return;
+  }
+
+
+  // ====================================================
+  // NORMAL ORDER
   // ====================================================
 
   const items =
@@ -961,13 +1107,14 @@ async function placeOrder() {
         data
       );
 
+
       alert(
         data.message ||
         "Could not place order."
       );
 
-      return;
 
+      return;
     }
 
 
@@ -1007,7 +1154,7 @@ async function placeOrder() {
     }
 
 
-    // Clear the SAME cart key used by getCart()
+    // Clear the cart
     localStorage.removeItem(
       "cart"
     );
@@ -1054,3 +1201,225 @@ document.addEventListener(
 
   }
 );
+
+
+
+async function payWithEsewa() {
+
+    const token =
+        localStorage.getItem("token");
+
+    const user =
+        JSON.parse(
+            localStorage.getItem("user")
+        );
+
+
+    if (!token || !user) {
+
+        alert("Please login first.");
+
+        window.location.href =
+            "login.html";
+
+        return;
+    }
+
+
+    const cart =
+        getCart();
+
+
+    if (!cart || cart.length === 0) {
+
+        alert("Your cart is empty.");
+
+        window.location.href =
+            "cart.html";
+
+        return;
+    }
+
+
+    const customerName =
+        document.getElementById(
+            "fullname"
+        ).value.trim();
+
+
+    const phone =
+        document.getElementById(
+            "phone"
+        ).value.trim();
+
+
+    const address =
+        document.getElementById(
+            "address"
+        ).value.trim();
+
+
+    const city =
+        document.getElementById(
+            "city"
+        ).value.trim();
+
+
+    if (
+        !customerName ||
+        !phone ||
+        !address ||
+        !city
+    ) {
+
+        alert(
+            "Please fill in all checkout information."
+        );
+
+        return;
+    }
+
+
+    const items =
+        cart.map(function(item) {
+
+            return {
+
+                productId:
+                    Number(item.id),
+
+                productName:
+                    item.title,
+
+                price:
+                    Number(item.price),
+
+                quantity:
+                    Number(item.quantity)
+
+            };
+
+        });
+
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/esewa/initiate",
+                {
+
+                    method: "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json",
+
+                        "Authorization":
+                            "Bearer " + token
+
+                    },
+
+                    body:
+                        JSON.stringify({
+
+                            customerName:
+                                customerName,
+
+                            phone:
+                                phone,
+
+                            address:
+                                address,
+
+                            city:
+                                city,
+
+                            items:
+                                items
+
+                        })
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            alert(
+                data.message ||
+                "Could not start eSewa payment."
+            );
+
+            return;
+        }
+
+
+        // -----------------------------------------
+        // Create form for eSewa
+        // -----------------------------------------
+
+        const form =
+            document.createElement(
+                "form"
+            );
+
+
+        form.method = "POST";
+
+        form.action =
+            data.paymentUrl;
+
+
+        Object.keys(
+            data.paymentData
+        ).forEach(function(key) {
+
+            const input =
+                document.createElement(
+                    "input"
+                );
+
+
+            input.type = "hidden";
+
+            input.name = key;
+
+            input.value =
+                data.paymentData[key];
+
+
+            form.appendChild(input);
+
+        });
+
+
+        document.body.appendChild(form);
+
+
+        // -----------------------------------------
+        // Send customer to eSewa
+        // -----------------------------------------
+
+        form.submit();
+
+
+    } catch (error) {
+
+        console.error(
+            "eSewa payment error:",
+            error
+        );
+
+        alert(
+            "Something went wrong while starting eSewa payment."
+        );
+
+    }
+
+}

@@ -6,6 +6,7 @@ const db = require("./db");
 
 const authRoutes = require("./routes/auth");
 const orderRoutes = require("./routes/orders");
+const esewaRoutes = require("./routes/esewa");
 
 dotenv.config();
 
@@ -36,6 +37,11 @@ app.use(
     orderRoutes
 );
 
+app.use(
+    "/api/esewa", 
+    esewaRoutes
+);
+
 
 // ======================================================
 // FRONTEND
@@ -46,6 +52,7 @@ app.use(
         path.join(__dirname, "../public")
     )
 );
+
 
 
 // ======================================================
