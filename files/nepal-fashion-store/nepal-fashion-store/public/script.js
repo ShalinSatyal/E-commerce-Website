@@ -190,8 +190,7 @@ const products = [
 // LOAD PRODUCTS
 // ======================================================
 
-function loadProducts() {
-
+function loadProducts(filteredProducts = products) {
   const productGrid =
     document.getElementById("product-grid");
 
@@ -219,8 +218,7 @@ function loadProducts() {
   productGrid.innerHTML = "";
 
 
-  products.forEach(function(product) {
-
+filteredProducts.forEach(function(product) {
     const productCard =
       document.createElement("div");
 
@@ -264,6 +262,66 @@ function loadProducts() {
     );
 
   });
+
+}
+
+// ======================================================
+// PRICE FILTER
+// ======================================================
+
+const priceFilter =
+  document.getElementById("price-filter");
+
+
+if (priceFilter) {
+
+  priceFilter.addEventListener(
+    "change",
+    function() {
+
+      const selectedRange =
+        this.value;
+
+
+      // Show all products
+      if (selectedRange === "all") {
+
+        loadProducts(products);
+
+        return;
+
+      }
+
+
+      const range =
+        selectedRange.split("-");
+
+
+      const minPrice =
+        Number(range[0]);
+
+
+      const maxPrice =
+        Number(range[1]);
+
+
+      const filteredProducts =
+        products.filter(function(product) {
+
+          return (
+            product.price >= minPrice &&
+            product.price <= maxPrice
+          );
+
+        });
+
+
+      loadProducts(
+        filteredProducts
+      );
+
+    }
+  );
 
 }
 
